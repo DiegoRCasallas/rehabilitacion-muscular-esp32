@@ -1,24 +1,32 @@
+from zoneinfo import ZoneInfo
+
 from app.application.services.catalog_services import (
     ActivityService, CalibrationService, PatientService)
 from app.application.services.fft_feature_extractor import FftFeatureExtractor
+from app.application.services.goal_policies import GoalPolicyFactory
 from app.application.services.linear_signal_normalizer import LinearSignalNormalizer
+from app.application.services.plan_service import PlanService
 from app.application.services.reading_service import ReadingService
+from app.application.services.recovery_service import RecoveryService
+from app.application.services.score_progress_metric import ScoreProgressMetric
 from app.application.services.session_service import SessionService
 from app.application.services.threshold_score_calculator import ThresholdScoreCalculator
 from app.infrastructure.database.base import create_session_factory
 from app.infrastructure.repositories.activity_repository import SqlActivityRepository
 from app.infrastructure.repositories.calibration_repository import SqlCalibrationRepository
 from app.infrastructure.repositories.patient_repository import SqlPatientRepository
+from app.infrastructure.repositories.plan_repository import SqlPlanRepository
 from app.infrastructure.repositories.session_repository import SqlSessionRepository
 
 
 class Container:
-    def __init__(self, database_url: str):
+    def __init__(self, database_url: str, timezone_name: str = "UTC"):
         factory = create_session_factory(database_url)
         patients = SqlPatientRepository(factory)
         activities = SqlActivityRepository(factory)
         calibrations = SqlCalibrationRepository(factory)
         sessions = SqlSessionRepository(factory)
+        plans = SqlPlanRepository(factory)
 
         self.patient_service = PatientService(patients, patients)
         self.activity_service = ActivityService(activities)
@@ -29,3 +37,8 @@ class Container:
             ThresholdScoreCalculator(threshold=0.5, points_per_sample=10))
         self.reading_service = ReadingService(self.session_service,
                                               FftFeatureExtractor())
+        self.plan_service = PlanService(patients, plans, plans, sessions,
+                                        GoalPolicyFactory(),
+                                        tz=ZoneInfo(timezone_name))
+        self.recovery_service = RecoveryService(patients, sessions,
+                                                ScoreProgressMetric(window=3))

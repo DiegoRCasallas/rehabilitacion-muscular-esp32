@@ -31,3 +31,11 @@ class SignalWindowSchema(Schema):
 
 class SessionFinishSchema(Schema):
     windows = fields.List(fields.Nested(SignalWindowSchema), required=True)
+
+
+class PlanCreateSchema(Schema):
+    name = fields.Str(required=True)
+    goal_type = fields.Str(required=True)
+    goal_target = fields.Int(required=True)
+    daily_score_goal = fields.Int(required=True)
+    start_date = fields.Date(required=True)

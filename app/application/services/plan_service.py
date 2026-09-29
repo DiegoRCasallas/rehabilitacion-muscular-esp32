@@ -1,5 +1,5 @@
-from datetime import date
-from typing import List
+from datetime import date, datetime, timezone, tzinfo
+from typing import List, Optional
 
 from app.application.services.goal_policies import GoalPolicyFactory
 from app.domain.entities.progress import PlanProgress, Progress
@@ -19,12 +19,14 @@ class PlanService:
         plan_writer: IPlanWriter,
         sessions: ISessionReader,
         goal_factory: GoalPolicyFactory,
+        tz: tzinfo = timezone.utc,
     ):
         self._patients = patients
         self._plan_reader = plan_reader
         self._plan_writer = plan_writer
         self._sessions = sessions
         self._goal_factory = goal_factory
+        self._tz = tz
 
     def create_plan(self, patient_id: int, name: str, goal_type: str,
                     goal_target: int, daily_score_goal: int,
@@ -39,18 +41,22 @@ class PlanService:
             start_date=start_date)
         return self._plan_writer.add(plan)
 
-    def get_progress(self, plan_id: int, today: date) -> PlanProgress:
+    def get_progress(self, plan_id: int, today: Optional[date] = None) -> PlanProgress:
         plan = self._plan_reader.get_by_id(plan_id)
         if plan is None:
             raise NotFoundError(f"Plan {plan_id} no existe")
 
+        today = today or datetime.now(self._tz).date()
         sessions = self._plan_sessions(plan)
         goal = self._goal_factory.create(plan.goal_type, plan.goal_target).evaluate(sessions)
 
-        today_score = sum(s.score for s in sessions if s.started_at.date() == today)
+        today_score = sum(s.score for s in sessions if self._local_date(s) == today)
         daily = Progress(current=today_score, target=plan.daily_score_goal)
         return PlanProgress(goal=goal, daily=daily)
 
+    def _local_date(self, session: Session) -> date:
+        return session.started_at.astimezone(self._tz).date()
+
     def _plan_sessions(self, plan: RehabilitationPlan) -> List[Session]:
         return [s for s in self._sessions.list_by_patient(plan.patient_id)
-                if s.ended_at is not None and s.started_at.date() >= plan.start_date]
+                if s.ended_at is not None and self._local_date(s) >= plan.start_date]
