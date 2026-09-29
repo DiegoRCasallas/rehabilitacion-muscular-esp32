@@ -1,7 +1,8 @@
 from datetime import datetime
+from datetime import date  
 from typing import Optional
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
@@ -42,3 +43,15 @@ class SessionModel(Base):
     started_at: Mapped[datetime] = mapped_column(DateTime)
     ended_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     score: Mapped[int] = mapped_column(Integer, default=0)
+
+class PlanModel(Base):
+    __tablename__ = "rehabilitation_plans"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True)
+    name: Mapped[str] = mapped_column(String(150))
+    goal_type: Mapped[str] = mapped_column(String(30))
+    goal_target: Mapped[int] = mapped_column(Integer)
+    daily_score_goal: Mapped[int] = mapped_column(Integer)
+    start_date: Mapped[date] = mapped_column(Date)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
