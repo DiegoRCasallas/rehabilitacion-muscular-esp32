@@ -2,7 +2,9 @@
 
 #define WIFI_SSID       "DIEGO ♧ Galaxy A34"
 #define WIFI_PASS       "nomeacuerdo"
-#define SERVER_URL      "http://192.168.1.50:5000"
+#define SERVER_URL      "http://10.94.235.93:5000"
+
+//10.94.235.93 - Dirección IP del servidor
 
 // Ids que ya existen en el servidor
 #define PATIENT_ID      1
