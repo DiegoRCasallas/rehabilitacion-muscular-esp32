@@ -11,7 +11,7 @@ from app.presentation.controllers.patients_controller import patients_bp
 from app.presentation.controllers.plans_controller import plans_bp
 from app.presentation.controllers.sessions_controller import sessions_bp
 from app.presentation.error_handlers import register_error_handlers
-
+from app.presentation.controllers.maintenance_controller import maintenance_bp
 
 def create_app(config_class=BaseConfig) -> Flask:
     app = Flask(__name__)
@@ -20,7 +20,7 @@ def create_app(config_class=BaseConfig) -> Flask:
                                             app.config["TIMEZONE"])
 
     for blueprint in (health_bp, patients_bp, activities_bp, sessions_bp,
-                      plans_bp, history_bp):
+                      plans_bp, history_bp, maintenance_bp):
         app.register_blueprint(blueprint)
     register_error_handlers(app)
 

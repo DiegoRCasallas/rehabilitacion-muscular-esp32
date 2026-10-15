@@ -4,8 +4,9 @@ from typing import List, Optional
 from sqlalchemy.orm import sessionmaker
 
 from app.domain.entities.session import Session
-from app.domain.interfaces.session_repository import ISessionReader, ISessionWriter
 from app.infrastructure.database.models import SessionModel
+from app.domain.interfaces.session_repository import (
+    IOpenSessionReader, ISessionReader, ISessionWriter)
 
 
 def _as_utc(value: Optional[datetime]) -> Optional[datetime]:
@@ -22,7 +23,7 @@ def _to_entity(m: SessionModel) -> Session:
     )
 
 
-class SqlSessionRepository(ISessionReader, ISessionWriter):
+class SqlSessionRepository(ISessionReader, ISessionWriter, IOpenSessionReader):
     def __init__(self, session_factory: sessionmaker):
         self._session_factory = session_factory
 
@@ -59,3 +60,8 @@ class SqlSessionRepository(ISessionReader, ISessionWriter):
             model.ended_at = session.ended_at
             db.commit()
             return _to_entity(model)
+
+    def list_open(self) -> List[Session]:
+        with self._session_factory() as db:
+            rows = db.query(SessionModel).filter(SessionModel.ended_at.is_(None)).all()
+            return [_to_entity(m) for m in rows]

@@ -28,4 +28,3 @@ class HistoryService:
 
         return [DailyHistory(day=d, sessions=c, total_score=sc)
                 for d, (c, sc) in sorted(totals.items())]
-    

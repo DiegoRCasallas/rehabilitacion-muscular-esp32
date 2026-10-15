@@ -23,7 +23,7 @@ from app.infrastructure.repositories.calibration_repository import SqlCalibratio
 from app.infrastructure.repositories.patient_repository import SqlPatientRepository
 from app.infrastructure.repositories.plan_repository import SqlPlanRepository
 from app.infrastructure.repositories.session_repository import SqlSessionRepository
-
+from app.application.services.stale_session_service import StaleSessionService
 
 class Container:
     def __init__(self, database_url: str, timezone_name: str = "UTC"):
@@ -61,3 +61,4 @@ class Container:
         self.plan_query = PlanQueryService(patients, plans)
         self.session_query = SessionQueryService(patients, sessions, tz=tz)
         self.history_service = HistoryService(patients, sessions, tz=tz)
+        self.stale_session_service = StaleSessionService(sessions, sessions, live_store)

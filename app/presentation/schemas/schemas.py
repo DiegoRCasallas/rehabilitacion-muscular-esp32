@@ -46,3 +46,6 @@ class ReadingSchema(SignalWindowSchema):
 class SessionQuerySchema(Schema):
     start = fields.Date(data_key="from")
     end = fields.Date(data_key="to")
+
+class CloseStaleSchema(Schema):
+    max_age_minutes = fields.Int(load_default=120)

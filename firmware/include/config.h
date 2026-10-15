@@ -1,0 +1,17 @@
+#pragma once
+
+#define WIFI_SSID       "DIEGO ♧ Galaxy A34"
+#define WIFI_PASS       "nomeacuerdo"
+#define SERVER_URL      "http://192.168.1.50:5000"
+
+// Ids que ya existen en el servidor
+#define PATIENT_ID      1
+#define ACTIVITY_ID     1
+#define CALIBRATION_ID  1
+
+#define EMG_PIN         34     // ADC1
+#define BUTTON_PIN      0      // botón BOOT de la placa
+#define LED_PIN         2      // LED integrado
+
+#define SAMPLE_RATE_HZ  1000   // requiere tick de FreeRTOS de 1 kHz (el de Arduino-ESP32)
+#define WINDOW_SIZE     200    // 200 ms por ventana
