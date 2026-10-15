@@ -24,3 +24,8 @@ def plan_progress(plan_id: int):
 def recovery(patient_id: int):
     value = get_container().recovery_service.calculate(patient_id)
     return jsonify(patient_id=patient_id, recovery_percentage=value)
+
+@plans_bp.get("/patients/<int:patient_id>/plans")
+def list_plans(patient_id: int):
+    items = get_container().plan_query.list_for_patient(patient_id)
+    return jsonify([serialize(p) for p in items])

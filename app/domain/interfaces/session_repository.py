@@ -18,3 +18,7 @@ class ISessionWriter(ABC):
 
     @abstractmethod
     def update(self, session: Session) -> Session: ...
+
+class IOpenSessionReader(ABC):
+    @abstractmethod
+    def list_open(self) -> List[Session]: ...

@@ -1,5 +1,8 @@
+from zoneinfo import ZoneInfo
+
 from flask import Flask
 
+from app.presentation.controllers.history_controller import history_bp
 from app.config import BaseConfig
 from app.container import Container
 from app.presentation.controllers.activities_controller import activities_bp
@@ -16,7 +19,8 @@ def create_app(config_class=BaseConfig) -> Flask:
     app.extensions["container"] = Container(app.config["DATABASE_URL"],
                                             app.config["TIMEZONE"])
 
-    for blueprint in (health_bp, patients_bp, activities_bp, sessions_bp, plans_bp):
+    for blueprint in (health_bp, patients_bp, activities_bp, sessions_bp,
+                      plans_bp, history_bp):
         app.register_blueprint(blueprint)
     register_error_handlers(app)
 

@@ -12,3 +12,8 @@ def create_activity():
     data = ActivityCreateSchema().load(request.get_json(silent=True) or {})
     activity = get_container().activity_service.create(**data)
     return jsonify(serialize(activity)), 201
+
+@activities_bp.get("")
+def list_activities():
+    items = get_container().activity_query.list_all()
+    return jsonify([serialize(a) for a in items])

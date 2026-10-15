@@ -24,3 +24,14 @@ def create_calibration(patient_id: int):
     data = CalibrationCreateSchema().load(request.get_json(silent=True) or {})
     profile = get_container().calibration_service.create(patient_id=patient_id, **data)
     return jsonify(serialize(profile)), 201
+
+@patients_bp.get("")
+def list_patients():
+    patients = get_container().patient_query.list_all()
+    return jsonify([serialize(p) for p in patients])
+
+
+@patients_bp.get("/<int:patient_id>/calibrations")
+def list_calibrations(patient_id: int):
+    items = get_container().calibration_query.list_for_patient(patient_id)
+    return jsonify([serialize(c) for c in items])

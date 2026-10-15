@@ -39,3 +39,10 @@ class PlanCreateSchema(Schema):
     goal_target = fields.Int(required=True)
     daily_score_goal = fields.Int(required=True)
     start_date = fields.Date(required=True)
+
+class ReadingSchema(SignalWindowSchema):
+    """Una ventana de muestras enviada durante la partida."""
+
+class SessionQuerySchema(Schema):
+    start = fields.Date(data_key="from")
+    end = fields.Date(data_key="to")

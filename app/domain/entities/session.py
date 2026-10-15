@@ -22,3 +22,10 @@ class Session:
             raise ValueError("El puntaje no puede ser negativo")
         self.score = score
         self.ended_at = _now()
+
+    def add_points(self, points: int) -> None:
+        if self.ended_at is not None:
+            raise ValueError("La sesión ya fue finalizada")
+        if points < 0:
+            raise ValueError("Los puntos no pueden ser negativos")
+        self.score += points
