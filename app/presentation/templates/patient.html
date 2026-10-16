@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_macros.html" import progress_bar %}
+{% block title %}{{ dashboard.patient.full_name }}{% endblock %}
+{% block content %}
+<h1>{{ dashboard.patient.full_name }}</h1>
+<p><a class="button" href="{{ url_for('web.play', patient_id=dashboard.patient.id) }}">Jugar Dino EMG</a></p>
+
+<section class="card">
+  <h2>Recuperación muscular</h2>
+  <p class="big">{{ "%+.1f"|format(dashboard.recovery_percentage) }}%</p>
+  <p class="muted">Mejora del puntaje promedio de las últimas 3 sesiones frente a las primeras 3.
+    Se muestra 0% hasta tener 6 sesiones finalizadas.</p>
+</section>
+
+<section class="card">
+  <h2>Planes de rehabilitación</h2>
+  {% for item in dashboard.plans %}
+    <h3>{{ item.plan.name }}</h3>
+    {{ progress_bar("Meta (" ~ item.plan.goal_type ~ ")", item.progress.goal) }}
+    {{ progress_bar("Objetivo de hoy", item.progress.daily) }}
+  {% else %}
+    <p class="muted">Sin planes. Créalos con <code>POST /patients/{{ dashboard.patient.id }}/plans</code>.</p>
+  {% endfor %}
+</section>
+
+<section class="card">
+  <h2>Historial diario</h2>
+  {% if dashboard.history %}
+  <table>
+    <thead><tr><th>Día</th><th>Sesiones</th><th>Puntaje</th></tr></thead>
+    <tbody>
+    {% for d in dashboard.history | reverse %}
+      <tr><td>{{ d.day.strftime('%d/%m/%Y') }}</td><td>{{ d.sessions }}</td><td>{{ d.total_score }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="muted">Sin sesiones finalizadas todavía.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Calibraciones</h2>
+  <table>
+    <thead><tr><th>Etiqueta</th><th>Reposo (mV)</th><th>Máxima (mV)</th><th>Frecuencia (Hz)</th></tr></thead>
+    <tbody>
+    {% for c in dashboard.calibrations %}
+      <tr><td>{{ c.label }}</td><td>{{ c.rest_amplitude }}</td><td>{{ c.max_amplitude }}</td><td>{{ c.base_frequency }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -2,8 +2,8 @@
 
 #define WIFI_SSID       "DIEGO ♧ Galaxy A34"
 #define WIFI_PASS       "nomeacuerdo"
-#define SERVER_URL      "http://10.94.235.93:5000"
-
+#define SERVER_URL      "http://10.94.235.163:5000"
+//10.94.235.163 -ip Asus servidor
 //10.94.235.93 - Dirección IP del servidor
 
 // Ids que ya existen en el servidor

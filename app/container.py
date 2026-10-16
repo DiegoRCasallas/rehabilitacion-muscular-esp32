@@ -24,9 +24,12 @@ from app.infrastructure.repositories.patient_repository import SqlPatientReposit
 from app.infrastructure.repositories.plan_repository import SqlPlanRepository
 from app.infrastructure.repositories.session_repository import SqlSessionRepository
 from app.application.services.stale_session_service import StaleSessionService
+from app.application.services.dashboard_service import DashboardService
+
 
 class Container:
-    def __init__(self, database_url: str, timezone_name: str = "UTC"):
+    def __init__(self, database_url: str, timezone_name: str = "UTC",
+                 activation_threshold: float = 0.5):
         factory = create_session_factory(database_url)
         patients = SqlPatientRepository(factory)
         activities = SqlActivityRepository(factory)
@@ -36,7 +39,8 @@ class Container:
         tz = ZoneInfo(timezone_name)
 
         normalizer = LinearSignalNormalizer()
-        score_calculator = ThresholdScoreCalculator(threshold=0.5, points_per_sample=10)
+        score_calculator = ThresholdScoreCalculator(threshold=activation_threshold,
+                                                    points_per_sample=10)
         extractor = FftFeatureExtractor()
         live_store = InMemoryLiveStateStore()
 
@@ -62,3 +66,6 @@ class Container:
         self.session_query = SessionQueryService(patients, sessions, tz=tz)
         self.history_service = HistoryService(patients, sessions, tz=tz)
         self.stale_session_service = StaleSessionService(sessions, sessions, live_store)
+        self.dashboard_service = DashboardService(
+            self.patient_service, self.calibration_query, self.plan_query,
+            self.plan_service, self.history_service, self.recovery_service)

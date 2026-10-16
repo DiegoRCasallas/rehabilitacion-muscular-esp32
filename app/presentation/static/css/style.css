@@ -1,0 +1,41 @@
+:root {
+  --bg: #fafafa; --fg: #222; --muted: #666; --card: #fff;
+  --border: #ddd; --accent: #2a7de1;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16181c; --fg: #e8e8e8; --muted: #9aa0a6; --card: #1f2228;
+    --border: #333; --accent: #5aa0f5;
+  }
+}
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+a { color: var(--accent); }
+.topbar { padding: .8rem 1.2rem; background: var(--card); border-bottom: 1px solid var(--border); }
+.topbar a { color: var(--fg); font-weight: 600; text-decoration: none; }
+main { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.muted { color: var(--muted); }
+.big { font-size: 2rem; font-weight: 700; margin: 0; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--border); }
+.button, button {
+  background: var(--accent); color: #fff; border: 0; border-radius: 6px;
+  padding: .5rem 1rem; font-size: 1rem; cursor: pointer; text-decoration: none; display: inline-block;
+}
+button:disabled { opacity: .5; cursor: default; }
+select { padding: .4rem; font-size: 1rem; }
+.progress { margin: .6rem 0; }
+.bar { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); }
+
+.controls { display: flex; flex-wrap: wrap; gap: .8rem; align-items: end; margin-bottom: 1rem; }
+.controls label { display: flex; flex-direction: column; font-size: .85rem; gap: .2rem; }
+canvas {
+  display: block; width: 100%; max-width: 800px; height: auto;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--fg); touch-action: none;
+}
+.hud { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin: .8rem 0; }
+.meter { position: relative; flex: 1; min-width: 200px; height: 16px; background: var(--border); border-radius: 8px; overflow: hidden; }
+.meter-fill { height: 100%; width: 0; background: var(--accent); transition: width .1s; }
+.meter-threshold { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--fg); }

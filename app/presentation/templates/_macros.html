@@ -1,0 +1,7 @@
+{% macro progress_bar(label, p) %}
+<div class="progress">
+  <div>{{ label }}: {{ p.current }} / {{ p.target }}
+    ({{ "%.0f"|format(p.percentage) }}%){% if p.completed %} ✓{% endif %}</div>
+  <div class="bar"><div class="bar-fill" style="width: {{ '%.0f'|format(p.percentage) }}%"></div></div>
+</div>
+{% endmacro %}

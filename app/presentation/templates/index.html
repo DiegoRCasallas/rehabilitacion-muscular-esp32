@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Pacientes</h1>
+{% if patients %}
+<table>
+  <thead><tr><th>Nombre</th><th></th><th></th></tr></thead>
+  <tbody>
+  {% for p in patients %}
+    <tr>
+      <td>{{ p.full_name }}</td>
+      <td><a href="{{ url_for('web.patient_dashboard', patient_id=p.id) }}">Progreso</a></td>
+      <td><a href="{{ url_for('web.play', patient_id=p.id) }}">Jugar</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Aún no hay pacientes. Créalos con <code>POST /patients</code>.</p>
+{% endif %}
+{% endblock %}
