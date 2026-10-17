@@ -104,3 +104,28 @@ export class DeviceEmgInput extends PollingInput {
     this.score = feedback.score;
   }
 }
+
+/** Recibe el feedback empujado por el servidor, sin polling. */
+export class WebSocketDeviceInput {
+  activation = 0;
+  score = 0;
+  #socket = null;
+
+  start(sessionId) {
+    this.activation = 0;
+    this.score = 0;
+    const protocol = location.protocol === "https:" ? "wss" : "ws";
+    this.#socket = new WebSocket(`${protocol}://${location.host}/ws/sessions/${sessionId}/watch`);
+    this.#socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.activation === undefined) return;   // ignora los ping
+      this.activation = data.activation;
+      this.score = data.score;
+    };
+  }
+
+  stop() {
+    this.#socket?.close();
+    this.#socket = null;
+  }
+}

@@ -34,7 +34,7 @@ def finish_session(session_id: int):
 @sessions_bp.post("/<int:session_id>/readings")
 def push_reading(session_id: int):
     data = ReadingSchema().load(request.get_json(silent=True) or {})
-    feedback = get_container().live_session_service.push_window(
+    feedback = get_container().streaming_service.push_window(
         session_id, _to_window(data))
     return jsonify(serialize(feedback))
 

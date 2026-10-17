@@ -25,6 +25,15 @@ from app.infrastructure.repositories.plan_repository import SqlPlanRepository
 from app.infrastructure.repositories.session_repository import SqlSessionRepository
 from app.application.services.stale_session_service import StaleSessionService
 from app.application.services.dashboard_service import DashboardService
+from app.application.services.streaming_session_service import StreamingSessionService
+from app.infrastructure.live_state.feedback_hub import LiveFeedbackHub
+
+from app.application.services.calibration_estimator import PercentileCalibrationEstimator
+from app.application.services.calibration_run_service import CalibrationRunService
+from app.application.services.game_catalog import GameCatalogService
+from app.application.services.home_service import PatientHomeService
+from app.infrastructure.live_state.calibration_run_store import InMemoryCalibrationRunStore
+
 
 
 class Container:
@@ -69,3 +78,17 @@ class Container:
         self.dashboard_service = DashboardService(
             self.patient_service, self.calibration_query, self.plan_query,
             self.plan_service, self.history_service, self.recovery_service)
+        self.feedback_hub = LiveFeedbackHub()
+        self.streaming_service = StreamingSessionService(
+            self.live_session_service, self.feedback_hub)
+
+        run_store = InMemoryCalibrationRunStore()
+        self.calibration_run_service = CalibrationRunService(
+            patients, run_store, run_store, extractor,
+            PercentileCalibrationEstimator(), calibrations)
+        self.game_catalog = GameCatalogService(activities, activities)
+        self.game_catalog.ensure_seeded()
+        self.home_service = PatientHomeService(self.patient_service,
+                                               self.calibration_query)
+
+        

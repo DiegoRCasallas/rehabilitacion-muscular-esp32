@@ -80,3 +80,10 @@ class SessionQueryService:
             if (start is None or local_day >= start) and (end is None or local_day <= end):
                 result.append(s)
         return result
+    def latest_open(self, patient_id: int) -> Session:
+        _require_patient(self._patients, patient_id)
+        open_sessions = [s for s in self._sessions.list_by_patient(patient_id)
+                            if s.ended_at is None]
+        if not open_sessions:
+            raise NotFoundError(f"Paciente {patient_id} sin sesión abierta")
+        return open_sessions[-1]

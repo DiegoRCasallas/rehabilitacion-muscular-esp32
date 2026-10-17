@@ -1,6 +1,7 @@
 import { ApiClient } from "./api.js";
 import { Game } from "./game.js";
 import { DeviceEmgInput, SimulatedEmgInput } from "./inputs.js";
+import { DeviceEmgInput, SimulatedEmgInput, WebSocketDeviceInput } from "./inputs.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -76,6 +77,7 @@ class GameApp {
 
   #createInput() {
     if ($("mode").value === "device") return new DeviceEmgInput(this.api);
+    if ($("mode").value === "device") return new WebSocketDeviceInput();
     const option = $("calibration").selectedOptions[0];
     const calibration = { rest: Number(option.dataset.rest), max: Number(option.dataset.max) };
     return new SimulatedEmgInput(this.api, calibration, this.canvas);

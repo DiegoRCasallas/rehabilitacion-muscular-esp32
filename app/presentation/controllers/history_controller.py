@@ -18,3 +18,7 @@ def patient_sessions(patient_id: int):
 def patient_history(patient_id: int):
     days = get_container().history_service.daily(patient_id)
     return jsonify([serialize(d) for d in days])
+
+@history_bp.get("/patients/<int:patient_id>/sessions/open")
+def open_session(patient_id: int):
+    return jsonify(serialize(get_container().session_query.latest_open(patient_id)))

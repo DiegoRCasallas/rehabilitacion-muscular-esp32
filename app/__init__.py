@@ -11,6 +11,9 @@ from app.presentation.controllers.plans_controller import plans_bp
 from app.presentation.controllers.sessions_controller import sessions_bp
 from app.presentation.controllers.web_controller import web_bp
 from app.presentation.error_handlers import register_error_handlers
+from app.presentation.websockets import register_websockets
+
+from app.presentation.controllers.calibration_controller import calibration_bp
 
 
 def create_app(config_class=BaseConfig) -> Flask:
@@ -23,8 +26,9 @@ def create_app(config_class=BaseConfig) -> Flask:
                                             app.config["ACTIVATION_THRESHOLD"])
 
     for blueprint in (health_bp, patients_bp, activities_bp, sessions_bp,
-                      plans_bp, history_bp, maintenance_bp, web_bp):
+                      plans_bp, history_bp, maintenance_bp, calibration_bp, web_bp):
         app.register_blueprint(blueprint)
     register_error_handlers(app)
+    register_websockets(app)
 
     return app

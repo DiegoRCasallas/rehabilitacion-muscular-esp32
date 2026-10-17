@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, validate
+from app.domain.entities.calibration_run import PHASES
 
 
 class PatientCreateSchema(Schema):
@@ -49,3 +50,10 @@ class SessionQuerySchema(Schema):
 
 class CloseStaleSchema(Schema):
     max_age_minutes = fields.Int(load_default=120)
+
+class CalibrationPhaseSchema(Schema):
+    phase = fields.Str(required=True, validate=validate.OneOf(PHASES))
+
+
+class CalibrationFinishSchema(Schema):
+    label = fields.Str(required=True, validate=validate.Length(min=1))
