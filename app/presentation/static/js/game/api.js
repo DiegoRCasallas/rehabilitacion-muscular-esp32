@@ -6,11 +6,12 @@ export class ApiClient {
       body: body === null ? undefined : JSON.stringify(body),
     });
     if (!response.ok) {
-      const error = new Error(`HTTP ${response.status} en ${path}`);
+      const detail = await response.json().catch(() => ({}));
+      const error = new Error(detail.error || `HTTP ${response.status} en ${path}`);
       error.status = response.status;
       throw error;
     }
-    return response.json();
+    return response.status === 204 ? null : response.json();
   }
 
   startSession(patientId, activityId, calibrationId) {
@@ -32,7 +33,28 @@ export class ApiClient {
     return this.#request(`/sessions/${sessionId}/close`, "POST", {});
   }
 
-  patientSessions(patientId) {
-    return this.#request(`/patients/${patientId}/sessions`);
+  startCalibration(patientId) {
+    return this.#request(`/patients/${patientId}/calibration-runs`, "POST", {});
+  }
+
+  calibrationStatus(runId) {
+    return this.#request(`/calibration-runs/${runId}`);
+  }
+
+  setCalibrationPhase(runId, phase) {
+    return this.#request(`/calibration-runs/${runId}/phase`, "POST", { phase });
+  }
+
+  pushCalibrationReading(runId, samples, sampleRateHz) {
+    return this.#request(`/calibration-runs/${runId}/readings`, "POST",
+      { samples, sample_rate_hz: sampleRateHz });
+  }
+
+  finishCalibration(runId, label) {
+    return this.#request(`/calibration-runs/${runId}/finish`, "POST", { label });
+  }
+
+  cancelCalibration(runId) {
+    return this.#request(`/calibration-runs/${runId}`, "DELETE");
   }
 }

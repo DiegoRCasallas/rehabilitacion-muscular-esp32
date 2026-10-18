@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Calibración{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('web.patient_home', patient_id=home.patient.id) }}">← Panel</a></p>
+<h1>Calibración · {{ home.patient.full_name }}</h1>
+{% if needed %}<p class="card notice">Necesitas calibrar antes de jugar.</p>{% endif %}
+
+<section id="calibration-root" class="card" data-patient-id="{{ home.patient.id }}">
+  <ol class="muted">
+    <li>Coloca los electrodos sobre el músculo a rehabilitar. Durante las pruebas con personas, alimenta el circuito con batería.</li>
+    <li>Elige la fuente de la señal e inicia.</li>
+    <li>Sigue las indicaciones: primero relajado y luego 3 contracciones máximas.</li>
+  </ol>
+
+  <div class="controls">
+    <label>Fuente de la señal
+      <select id="mode">
+        <option value="device">Dispositivo ESP32</option>
+        <option value="simulator">Simulador (mantén ESPACIO al contraer)</option>
+      </select>
+    </label>
+    <label>Músculo
+      <input id="label" type="text" value="Bíceps derecho" maxlength="100">
+    </label>
+    <button id="start" type="button">Iniciar calibración</button>
+    <button id="cancel" type="button" disabled>Cancelar</button>
+  </div>
+
+  <div id="instruction" class="instruction" hidden>
+    <div id="instruction-text" class="big"></div>
+    <div id="instruction-timer" class="muted"></div>
+    <div class="bar"><div id="protocol-fill" class="bar-fill"></div></div>
+  </div>
+
+  <div class="meter"><div id="signal-fill" class="meter-fill"></div></div>
+  <p id="signal-text" class="muted">Amplitud: — mV</p>
+  <p id="status" class="muted"></p>
+
+  <div id="result" class="card" hidden>
+    <h2>Calibración guardada</h2>
+    <p>Reposo: <strong id="res-rest"></strong> mV ·
+       Máxima: <strong id="res-max"></strong> mV ·
+       Frecuencia: <strong id="res-freq"></strong> Hz</p>
+        <a class="button" href="{{ url_for('web.choose_game', patient_id=home.patient.id) }}">Ir a jugar</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/calibration/main.js') }}"></script>
+{% endblock %}

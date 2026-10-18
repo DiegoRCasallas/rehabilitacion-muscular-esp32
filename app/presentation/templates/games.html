@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Elige un juego{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('web.patient_home', patient_id=home.patient.id) }}">← Panel</a></p>
+<h1>Elige un juego</h1>
+<p class="muted">Calibración activa: <strong>{{ home.latest_calibration.label }}</strong> ·
+  <a href="{{ url_for('web.calibrate', patient_id=home.patient.id) }}">Recalibrar</a></p>
+
+<div class="game-grid">
+  {% for g in games %}
+  <a class="card game-card" href="{{ url_for('web.play', patient_id=home.patient.id, game_key=g.key) }}">
+    <h2>{{ g.name }}</h2>
+    <p class="muted">{{ g.description }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,31 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Dino EMG{% endblock %}
+{% block title %}{{ game.name }}{% endblock %}
 {% block content %}
-<h1>Dino EMG · {{ patient.full_name }}</h1>
+<p><a href="{{ url_for('web.choose_game', patient_id=home.patient.id) }}">← Cambiar de juego</a></p>
+<h1>{{ game.name }} · {{ home.patient.full_name }}</h1>
 
-{% if not calibrations or not activities %}
-  <p class="card">Faltan datos para jugar: se necesita al menos una actividad
-    (<code>POST /activities</code>) y una calibración del paciente.</p>
-{% else %}
 <section id="game-root"
-         data-patient-id="{{ patient.id }}"
+         data-patient-id="{{ home.patient.id }}"
+         data-activity-id="{{ game.activity_id }}"
+         data-game="{{ game.key }}"
          data-threshold="{{ threshold }}">
   <div class="controls">
     <label>Modo
       <select id="mode">
-        <option value="simulator">Simulador (mantén ESPACIO)</option>
         <option value="device">Dispositivo ESP32</option>
-      </select>
-    </label>
-    <label>Actividad
-      <select id="activity">
-        {% for a in activities %}<option value="{{ a.id }}">{{ a.name }}</option>{% endfor %}
+        <option value="simulator">Simulador (mantén ESPACIO)</option>
       </select>
     </label>
     <label>Calibración
       <select id="calibration">
-        {% for c in calibrations %}
-        <option value="{{ c.id }}" data-rest="{{ c.rest_amplitude }}" data-max="{{ c.max_amplitude }}">{{ c.label }}</option>
+        {% for c in home.calibrations | sort(attribute='id', reverse=True) %}
+        <option value="{{ c.id }}" data-rest="{{ c.rest_amplitude }}" data-max="{{ c.max_amplitude }}"
+                {% if c.id == home.latest_calibration.id %}selected{% endif %}>{{ c.label }}</option>
         {% endfor %}
       </select>
     </label>
@@ -37,26 +32,17 @@
 
   <div class="hud">
     <div>Puntaje de rehabilitación: <strong id="hud-score">0</strong></div>
-    <div>Distancia: <strong id="hud-distance">0</strong> m</div>
+    <div><span id="hud-progress-label"></span>: <strong id="hud-progress">0</strong></div>
     <div class="meter" title="Activación muscular">
       <div id="activation-fill" class="meter-fill"></div>
       <div class="meter-threshold" style="left: {{ '%.0f'|format(threshold * 100) }}%"></div>
     </div>
   </div>
 
-  <p id="status" class="muted">
-    Contrae el músculo para saltar. Para volver a saltar, relaja y contrae de nuevo.
-  </p>
-  <p class="muted">
-    Modo dispositivo: pulsa BOOT en el ESP32 para abrir la sesión y luego «Iniciar».
-    La actividad y la calibración las define el firmware (<code>config.h</code>).
-  </p>
+  <p id="status" class="muted">En modo dispositivo, pulsa BOOT en el ESP32 cuando aparezca el aviso.</p>
 </section>
-{% endif %}
 {% endblock %}
 
 {% block scripts %}
-{% if calibrations and activities %}
 <script type="module" src="{{ url_for('static', filename='js/game/main.js') }}"></script>
-{% endif %}
 {% endblock %}

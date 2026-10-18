@@ -2,7 +2,7 @@
 
 #define WIFI_SSID       "DIEGO ♧ Galaxy A34"
 #define WIFI_PASS       "nomeacuerdo"
-#define SERVER_URL      "http://10.94.235.163:5000"
+#define SERVER_URL      "http://10.94.235.93:5000"
 //10.94.235.163 -ip Asus conectado al celular Diego
 //10.94.235.93 - Dirección IP HP conectado al celular Diego
 

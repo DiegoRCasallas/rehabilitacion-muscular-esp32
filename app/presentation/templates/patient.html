@@ -2,8 +2,8 @@
 {% from "_macros.html" import progress_bar %}
 {% block title %}{{ dashboard.patient.full_name }}{% endblock %}
 {% block content %}
+<p><a href="{{ url_for('web.patient_home', patient_id=dashboard.patient.id) }}">← Volver al panel</a></p>
 <h1>{{ dashboard.patient.full_name }}</h1>
-<p><a class="button" href="{{ url_for('web.play', patient_id=dashboard.patient.id) }}">Jugar Dino EMG</a></p>
 
 <section class="card">
   <h2>Recuperación muscular</h2>

@@ -3,15 +3,19 @@
 <h1>Pacientes</h1>
 {% if patients %}
 <table>
-  <thead><tr><th>Nombre</th><th></th><th></th></tr></thead>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th></th>
+    </tr>
+  </thead>
   <tbody>
-  {% for p in patients %}
+    {% for p in patients %}
     <tr>
       <td>{{ p.full_name }}</td>
-      <td><a href="{{ url_for('web.patient_dashboard', patient_id=p.id) }}">Progreso</a></td>
-      <td><a href="{{ url_for('web.play', patient_id=p.id) }}">Jugar</a></td>
+      <td><a href="{{ url_for('web.patient_home', patient_id=p.id) }}">Entrar</a></td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 {% else %}

@@ -8,13 +8,14 @@ function overlaps(a, b) {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
-export class Game {
+export class DinoGame {
   #running = false;
   #lastTime = 0;
   #frameId = null;
   #wasActive = false;
   #speed = BASE_SPEED;
   #distance = 0;
+  static label = "Distancia (m)";
 
   constructor(canvas, input, { threshold, onFrame, onGameOver }) {
     this.canvas = canvas;
@@ -28,6 +29,10 @@ export class Game {
   }
 
   get distance() {
+    return this.#distance;
+  }
+
+    get progress() {
     return this.#distance;
   }
 
@@ -68,14 +73,14 @@ export class Game {
     this.#distance += (this.#speed * dt) / 10;
 
     this.onFrame({
-      distance: this.#distance,
+      progress: this.#distance,
       activation: this.input.activation,
       score: this.input.score,
     });
 
     if (this.field.items.some((o) => overlaps(this.dino.box, o.box))) {
       this.stop();
-      this.onGameOver({ distance: this.#distance });
+      this.onGameOver({ progress: this.#distance });
     }
   }
 

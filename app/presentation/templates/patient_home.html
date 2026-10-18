@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ home.patient.full_name }}{% endblock %}
+{% block content %}
+<h1>Hola, {{ home.patient.full_name }}</h1>
+<p class="muted">Calibra, juega y, cuando quieras, revisa tu recuperación.</p>
+
+<div class="hub">
+  <section class="card step">
+    <span class="step-number">1</span>
+    <h2>Calibrar</h2>
+    {% if home.latest_calibration %}
+      <p><span  <p><span class="badge ok">Calibrado</span> {{ home.latest_calibration.label }}</p>
+      <p class="muted">Recalibra si cambias de músculo o recolocas los electrodos.</p>
+      <a class="button secondary" href="{{ url_for('web.calibrate', patient_id=home.patient.id) }}">Recalibrar</a>
+    {% else %}
+      <p><span class="badge warn">Pendiente</span></p>
+      <p class="muted">Con los electrodos puestos, contraerás el músculo cuando se te indique.</p>
+      <a class="button" href="{{ url_for('web.calibrate', patient_id=home.patient.id) }}">Empezar calibración</a>
+    {% endif %}
+  </section>
+
+    <section class="card step {% if not home.can_play %}locked{% endif %}">
+    <span class="step-number">2</span>
+    <h2>Jugar</h2>
+    {% if home.can_play %}
+      <p class="muted">Elige entre varios juegos controlados con tu músculo.</p>
+      <a class="button" href="{{ url_for('web.choose_game', patient_id=home.patient.id) }}">Elegir juego</a>
+    {% else %}
+      <p class="muted">Primero calibra para desbloquear los juegos.</p>
+    {% endif %}
+  </section>
+
+  <section class="card step">
+    <span class="step-number">3</span>
+    <h2>Mi recuperación</h2>
+    <p class="muted">Metas, objetivo diario, historial y progreso muscular.</p>
+    <a class="button secondary" href="{{ url_for('web.patient_dashboard', patient_id=home.patient.id) }}">Ver mis datos</a>
+  </section>
+</div>
+{% endblock %}

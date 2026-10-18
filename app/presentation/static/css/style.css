@@ -39,3 +39,18 @@ canvas {
 .meter { position: relative; flex: 1; min-width: 200px; height: 16px; background: var(--border); border-radius: 8px; overflow: hidden; }
 .meter-fill { height: 100%; width: 0; background: var(--accent); transition: width .1s; }
 .meter-threshold { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--fg); }
+
+[hidden] { display: none !important; }
+.hub, .game-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.step { position: relative; }
+.step-number { position: absolute; top: .6rem; right: 1rem; font-size: 1.8rem; font-weight: 700; color: var(--border); }
+.locked { opacity: .55; }
+.badge { padding: .1rem .55rem; border-radius: 10px; font-size: .8rem; color: #fff; }
+.badge.ok { background: #2e8b57; }
+.badge.warn { background: #d98c00; }
+.button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.notice { border-color: #d98c00; }
+.instruction { text-align: center; padding: 1rem 0; }
+.game-card { text-decoration: none; color: var(--fg); }
+.game-card:hover { border-color: var(--accent); }
+input[type=text] { padding: .4rem; font-size: 1rem; }

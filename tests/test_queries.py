@@ -50,8 +50,8 @@ def test_lista_pacientes(client):
 
 def test_lista_actividades(client):
     client.post("/activities", json={"name": "Globos"})
-    assert len(client.get("/activities").get_json()) == 1
-
+    names = [a["name"] for a in client.get("/activities").get_json()]
+    assert "Globos" in names
 
 def test_lista_calibraciones_y_planes_del_paciente(client):
     patient, _, _ = _setup(client)
