@@ -23,8 +23,9 @@ def create_app(config_class=BaseConfig) -> Flask:
     app.config.from_object(config_class)
     app.extensions["container"] = Container(app.config["DATABASE_URL"],
                                             app.config["TIMEZONE"],
-                                            app.config["ACTIVATION_THRESHOLD"])
-
+                                            app.config["ACTIVATION_THRESHOLD"],
+                                            app.config["SIGNAL_MODE"])
+    
     for blueprint in (health_bp, patients_bp, activities_bp, sessions_bp,
                       plans_bp, history_bp, maintenance_bp, calibration_bp, web_bp):
         app.register_blueprint(blueprint)

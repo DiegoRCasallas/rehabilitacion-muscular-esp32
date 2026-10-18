@@ -5,96 +5,150 @@
 #include "sampler.h"
 #include "stream_client.h"
 
-enum class Mode { Idle, Game, Calibration };
-enum class Press { None, Short, Long };
+enum class Mode
+{
+  Idle,
+  Game,
+  Calibration
+};
+enum class Press
+{
+  None,
+  Short,
+  Long
+};
 
 static QueueHandle_t windowQueue;
-static Sampler* sampler = nullptr;
+static Sampler *sampler = nullptr;
 static ApiClient api(SERVER_URL);
 static StreamClient stream;
 static Mode mode = Mode::Idle;
-static int targetId = -1;   // id de la sesión o de la calibración, según el modo
+static int targetId = -1; // id de la sesión o de la calibración, según el modo
 
-static void connectWifi() {
+static void connectWifi()
+{
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   Serial.print("Conectando a WiFi");
-  while (WiFi.status() != WL_CONNECTED) { delay(300); Serial.print('.'); }
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(300);
+    Serial.print('.');
+  }
   Serial.printf("\nIP: %s\n", WiFi.localIP().toString().c_str());
 }
 
 // Distingue pulso corto y largo al soltar el botón
-static Press readButton() {
+static Press readButton()
+{
   static bool down = false;
   static uint32_t since = 0;
   bool pressed = digitalRead(BUTTON_PIN) == LOW;
-  if (pressed && !down) {
+  if (pressed && !down)
+  {
     down = true;
     since = millis();
-  } else if (!pressed && down) {
+  }
+  else if (!pressed && down)
+  {
     down = false;
     uint32_t held = millis() - since;
-    if (held < 30) return Press::None;                 // rebote
+    if (held < 30)
+      return Press::None; // rebote
     return held >= 1500 ? Press::Long : Press::Short;
   }
   return Press::None;
 }
 
-static void stopCurrent(const char* reason) {
+static void stopCurrent(const char *reason)
+{
   sampler->setActive(false);
-  if (mode == Mode::Game) stream.end();
+  stream.end();
   digitalWrite(LED_PIN, LOW);
   Serial.printf("Detenido: %s\n", reason);
   mode = Mode::Idle;
   targetId = -1;
 }
-
-static void startGame() {
+static void startGame()
+{
   int id = api.openSession(PATIENT_ID);
-  if (id < 0) { Serial.println("No hay sesión abierta: pulsa «Iniciar» en el navegador"); return; }
+  if (id < 0)
+  {
+    Serial.println("No hay sesión abierta: pulsa «Iniciar» en el navegador");
+    return;
+  }
   targetId = id;
   mode = Mode::Game;
   xQueueReset(windowQueue);
-  stream.begin(id);
+  // stream.begin(id);
+  stream.beginSession(id);
   sampler->setActive(true);
   Serial.printf("Unido a la sesión %d\n", id);
 }
 
-static void startCalibration() {
+static void startCalibration()
+{
   int id = api.activeCalibrationRun(PATIENT_ID);
-  if (id < 0) { Serial.println("No hay calibración en curso: pulsa «Iniciar calibración» en el navegador"); return; }
+  if (id < 0)
+  {
+    Serial.println("No hay calibración en curso: pulsa «Iniciar calibración» en el navegador");
+    return;
+  }
   targetId = id;
   mode = Mode::Calibration;
   xQueueReset(windowQueue);
+  stream.beginCalibration(id);
   sampler->setActive(true);
   Serial.printf("Unido a la calibración %d\n", id);
 }
 
-static void showFeedback(const Feedback& fb) {
+static void showFeedback(const Feedback &fb)
+{
   digitalWrite(LED_PIN, fb.activation >= 0.5 ? HIGH : LOW);
   Serial.printf("amp=%.0f mV  activación=%.2f  puntaje=%d\n", fb.amplitude, fb.activation, fb.score);
 }
 
-static void handleGameWindow(const Window& window) {
-  if (stream.connected()) {
-    if (!stream.sendWindow(window)) Serial.println("! error enviando por WS");
-  } else {
-    Feedback fb;                                       // respaldo por HTTP
-    if (api.sendWindow(targetId, window, fb)) showFeedback(fb);
-  }
-}
-
-static void handleCalibrationWindow(const Window& window) {
-  String phase;
-  float amplitude = 0;
-  int code = api.sendCalibrationWindow(targetId, window, phase, amplitude);
-  if (code == 404) { stopCurrent("la calibración terminó en el navegador"); return; }
-  if (code != 200) { Serial.println("! error enviando ventana de calibración"); return; }
+static void showCalibration(const String& phase, float amplitude) {
   digitalWrite(LED_PIN, phase == "contraction" ? HIGH : LOW);   // LED = «contrae ahora»
   Serial.printf("[%s] amp=%.0f mV\n", phase.c_str(), amplitude);
 }
 
-void setup() {
+static void handleGameWindow(const Window &window)
+{
+  if (stream.connected())
+  {
+    if (!stream.sendWindow(window))
+      Serial.println("! error enviando por WS");
+  }
+  else
+  {
+    Feedback fb; // respaldo por HTTP
+    if (api.sendWindow(targetId, window, fb))
+      showFeedback(fb);
+  }
+}
+
+static void handleCalibrationWindow(const Window &window)
+{
+  String phase;
+  float amplitude = 0;
+  int code = api.sendCalibrationWindow(targetId, window, phase, amplitude);
+  if (code == 404)
+  {
+    stopCurrent("la calibración terminó en el navegador");
+    return;
+  }
+  if (code != 200)
+  {
+    Serial.println("! error enviando ventana de calibración");
+    return;
+  }
+  digitalWrite(LED_PIN, phase == "contraction" ? HIGH : LOW); // LED = «contrae ahora»
+  Serial.printf("[%s] amp=%.0f mV\n", phase.c_str(), amplitude);
+}
+
+void setup()
+{
   Serial.begin(115200);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(LED_PIN, OUTPUT);
@@ -116,7 +170,7 @@ void loop() {
   }
   if (mode == Mode::Idle) { delay(10); return; }
 
-  if (mode == Mode::Game) stream.loop();
+  stream.loop();
 
   Window window;
   if (xQueueReceive(windowQueue, &window, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -127,6 +181,10 @@ void loop() {
   if (mode == Mode::Game) {
     Feedback fb;
     if (stream.takeFeedback(fb)) showFeedback(fb);
-    if (stream.rejected()) stopCurrent("el servidor cerró la sesión");
+  } else {
+    String phase;
+    float amplitude;
+    if (stream.takeCalibration(phase, amplitude)) showCalibration(phase, amplitude);
   }
+  if (stream.rejected()) stopCurrent("el servidor cerró la sesión o la calibración");
 }

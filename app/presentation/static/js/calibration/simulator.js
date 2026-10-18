@@ -35,10 +35,9 @@ export class SimulatedCalibrationSignal {
     this.#busy = true;
     try {
       const base = this.#holding ? CONTRACTION_PEAK_TO_PEAK : REST_PEAK_TO_PEAK;
-      const peakToPeak = base * (1 + (Math.random() - 0.5) * 0.2);   // ±10 % de ruido
-      const amplitude = peakToPeak / 2;
-      const samples = Array.from({ length: WINDOW_SIZE }, (_, i) =>
-        amplitude * Math.sin(2 * Math.PI * FREQUENCY_HZ * i / SAMPLE_RATE_HZ));
+    
+    const level = base * (1 + (Math.random() - 0.5) * 0.2);   // ±10 % de ruido
+      const samples = Array(WINDOW_SIZE).fill(level);
       await this.api.pushCalibrationReading(this.runId, samples, SAMPLE_RATE_HZ);
     } catch (error) {
       console.warn(error);

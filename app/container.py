@@ -33,12 +33,12 @@ from app.application.services.calibration_run_service import CalibrationRunServi
 from app.application.services.game_catalog import GameCatalogService
 from app.application.services.home_service import PatientHomeService
 from app.infrastructure.live_state.calibration_run_store import InMemoryCalibrationRunStore
-
+from app.application.services.level_feature_extractor import LevelFeatureExtractor
 
 
 class Container:
     def __init__(self, database_url: str, timezone_name: str = "UTC",
-                 activation_threshold: float = 0.5):
+                 activation_threshold: float = 0.5, signal_mode: str = "wave"):
         factory = create_session_factory(database_url)
         patients = SqlPatientRepository(factory)
         activities = SqlActivityRepository(factory)
@@ -50,7 +50,8 @@ class Container:
         normalizer = LinearSignalNormalizer()
         score_calculator = ThresholdScoreCalculator(threshold=activation_threshold,
                                                     points_per_sample=10)
-        extractor = FftFeatureExtractor()
+        extractor = (LevelFeatureExtractor() if signal_mode == "level"
+                     else FftFeatureExtractor())
         live_store = InMemoryLiveStateStore()
 
         self.patient_service = PatientService(patients, patients)

@@ -21,3 +21,4 @@
 
 #define SAMPLE_RATE_HZ  1000   // requiere tick de FreeRTOS de 1 kHz (el de Arduino-ESP32)
 #define WINDOW_SIZE     200    // 200 ms por ventana
+#define POT_TEST_MODE   0

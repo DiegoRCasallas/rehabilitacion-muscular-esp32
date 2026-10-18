@@ -16,5 +16,5 @@ class CalibrationProfile:
             raise ValueError("La calibración necesita una etiqueta")
         if self.max_amplitude <= self.rest_amplitude:
             raise ValueError("max_amplitude debe ser mayor que rest_amplitude")
-        if self.base_frequency <= 0:
-            raise ValueError("base_frequency debe ser positiva")
+        if self.base_frequency < 0:
+            raise ValueError("base_frequency no puede ser negativa")

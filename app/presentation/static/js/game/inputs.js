@@ -79,16 +79,11 @@ export class SimulatedEmgInput extends PollingInput {
     const { rest, max } = this.calibration;
     const target = this.#holding ? rest + SIMULATED_EFFORT * (max - rest) : rest;
     const feedback = await this.api.pushReading(
-      this.sessionId, this.#sineWave(target), SAMPLE_RATE_HZ);
+      this.sessionId, Array(WINDOW_SIZE).fill(target), SAMPLE_RATE_HZ);
     this.activation = feedback.activation;
     this.score = feedback.score;
   }
 
-  #sineWave(peakToPeak) {
-    const amplitude = peakToPeak / 2;
-    return Array.from({ length: WINDOW_SIZE }, (_, i) =>
-      amplitude * Math.sin(2 * Math.PI * SIMULATED_FREQUENCY_HZ * i / SAMPLE_RATE_HZ));
-  }
 }
 
 /** Lee el estado en vivo que publica el ESP32. */
