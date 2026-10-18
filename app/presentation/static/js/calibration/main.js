@@ -31,6 +31,8 @@ class CalibrationApp {
     this.#cancelled = false;
     this.#peak = 1;
     $("result").hidden = true;
+    $("calibration-counts").textContent =
+      "Ventanas recibidas · Reposo: 0 · Contracción: 0";
     this.#setRunning(true);
 
     try {
@@ -127,10 +129,13 @@ class CalibrationApp {
     $("protocol-fill").style.width = `${Math.round((done / total) * 100)}%`;
   }
 
-  #renderSignal({ last_amplitude: amplitude }) {
+  #renderSignal({ last_amplitude: amplitude, rest_windows: restWindows,
+                  contraction_windows: contractionWindows }) {
     this.#peak = Math.max(this.#peak, amplitude);
     $("signal-text").textContent = `Amplitud: ${Math.round(amplitude)} mV`;
     $("signal-fill").style.width = `${Math.round((amplitude / this.#peak) * 100)}%`;
+    $("calibration-counts").textContent =
+      `Ventanas recibidas · Reposo: ${restWindows} · Contracción: ${contractionWindows}`;
   }
 
   #showResult(profile) {

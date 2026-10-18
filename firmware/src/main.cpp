@@ -130,6 +130,14 @@ static void handleGameWindow(const Window &window)
 
 static void handleCalibrationWindow(const Window &window)
 {
+  if (stream.connected() && stream.sendWindow(window))
+    return;
+
+  if (stream.connected())
+  {
+    Serial.println("! error enviando ventana de calibración por WS; usando HTTP");
+  }
+
   String phase;
   float amplitude = 0;
   int code = api.sendCalibrationWindow(targetId, window, phase, amplitude);
@@ -140,11 +148,10 @@ static void handleCalibrationWindow(const Window &window)
   }
   if (code != 200)
   {
-    Serial.println("! error enviando ventana de calibración");
+    Serial.printf("! error HTTP enviando ventana de calibración (código %d)\n", code);
     return;
   }
-  digitalWrite(LED_PIN, phase == "contraction" ? HIGH : LOW); // LED = «contrae ahora»
-  Serial.printf("[%s] amp=%.0f mV\n", phase.c_str(), amplitude);
+  showCalibration(phase, amplitude);
 }
 
 void setup()
@@ -154,7 +161,12 @@ void setup()
   pinMode(LED_PIN, OUTPUT);
   connectWifi();
 
-  windowQueue = xQueueCreate(5, sizeof(Window));
+  windowQueue = xQueueCreate(25, sizeof(Window));
+  if (windowQueue == nullptr)
+  {
+    Serial.println("! no se pudo crear la cola de ventanas");
+    return;
+  }
   sampler = new Sampler(EMG_PIN, windowQueue);
   sampler->start();
 

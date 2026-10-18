@@ -7,7 +7,7 @@
 //10.94.235.93 - Dirección IP HP conectado al celular Diego
 
 //esto es para el websocket
-#define SERVER_HOST     "192.168.1.50"
+#define SERVER_HOST     "10.94.235.93"
 #define SERVER_PORT     5000
 
 // Ids que ya existen en el servidor
@@ -19,6 +19,6 @@
 #define BUTTON_PIN      0      // botón BOOT de la placa
 #define LED_PIN         2      // LED integrado
 
-#define SAMPLE_RATE_HZ  1000   // requiere tick de FreeRTOS de 1 kHz (el de Arduino-ESP32)
+#define SAMPLE_RATE_HZ  1000
 #define WINDOW_SIZE     200    // 200 ms por ventana
 #define POT_TEST_MODE   0
